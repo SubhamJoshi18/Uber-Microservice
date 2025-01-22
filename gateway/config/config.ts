@@ -5,5 +5,5 @@ export const microServicesConfig  : IMicroServiceConfig= {
     user : userUrl,
     auth: authUrl,
     rider : riderUrl,
-    rides :riderUrl
+    rides :ridesUrl
 }

@@ -1,0 +1,1 @@
+{"root":["./proxy.ts","./config/config.ts","./config/types.ts","./constants/constants.ts","./libs/common.logger.ts","./utils/getenv.ts"],"errors":true,"version":"5.7.3"}

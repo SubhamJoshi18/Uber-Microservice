@@ -2,9 +2,11 @@
   "name": "gateway",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "proxy.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc --build",
+    "start:dev": "npm run build && ./dist/proxy.js",
+    "start": "nodemon ./proxy.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,7 @@
     "@types/express-http-proxy": "^1.6.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.7",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }
 }
