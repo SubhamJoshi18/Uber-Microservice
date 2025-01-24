@@ -12,9 +12,6 @@ class JsonWebTokenHelper {
             return validAccessToken && validObjects
     }
 
-
-
-
     private getServiceToken (serviceType :  ServiceEnum) {
         switch (serviceType) {
             case ServiceEnum.ACCESS_TOKEN : {
