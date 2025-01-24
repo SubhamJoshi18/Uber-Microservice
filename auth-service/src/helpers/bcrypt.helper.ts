@@ -9,7 +9,7 @@ class BcryptHelper {
 
    
     public async hashPassword(rawPassword : string) {
-        const saltNumber = getEnvValue('SALT')
+        const saltNumber = Number(getEnvValue('SALT'))
         const salt = await this.generateSalt(saltNumber as unknown as number)
         return await bcrypt.hash(rawPassword,salt)
     }

@@ -8,3 +8,5 @@ const authRouter  : Router = Router()
 authRouter.post('/register',isValidPublicUrl,AuthController.registerUser)
 
 
+
+export default authRouter

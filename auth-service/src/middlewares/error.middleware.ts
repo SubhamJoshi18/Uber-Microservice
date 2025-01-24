@@ -4,6 +4,7 @@ import { HttpExceptions } from '../exceptions/index'
 
 export default async function errorHandler (err : HttpExceptions, _req:Request, res:Response) {
     const isValidInstance = err instanceof HttpExceptions
+    
     if(isValidInstance) {
             const {status,statusCode,ExceptionName,message} = formatError(err as HttpExceptions)
             return res.status(statusCode).json({

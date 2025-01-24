@@ -17,6 +17,13 @@ class AuthRepository {
         return existsDocument
     }
 
+    async findOnePhoneNumber(value:string){
+        const existsDocument = await User.findOne({
+            phoneNumber : value
+        })
+        return existsDocument
+    }
+
 
     async savedRegisterData(data : IRegisterBody ) {
         const savedResult = await User.create({
