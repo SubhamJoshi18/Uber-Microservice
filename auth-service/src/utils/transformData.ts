@@ -7,3 +7,8 @@ export const convertNumber = <T>(value : T) : number => {
         return Number(value)
     }
 }
+
+
+export const formattedMongooseMessage = (value : string) => {
+    return `The mongose Attribute ${value} is Required , but it is currently missing`
+}

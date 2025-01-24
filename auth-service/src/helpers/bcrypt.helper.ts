@@ -1,0 +1,25 @@
+import bcrypt from 'bcrypt'
+import { getEnvValue } from '../utils/getEnv'
+
+class BcryptHelper {
+
+    public async generateSalt(saltNumber : number) {
+        return saltNumber > 0 ? await bcrypt.genSalt(saltNumber) : await bcrypt.genSalt(10)
+    }
+
+   
+    public async hashPassword(rawPassword : string) {
+        const saltNumber = getEnvValue('SALT')
+        const salt = await this.generateSalt(saltNumber as unknown as number)
+        return await bcrypt.hash(rawPassword,salt)
+    }
+
+
+    public async compareHashPassword (rawPassword : string, dbPassword : string) {
+        return await bcrypt.compare(rawPassword,dbPassword)
+    }
+    
+}
+
+
+export default BcryptHelper

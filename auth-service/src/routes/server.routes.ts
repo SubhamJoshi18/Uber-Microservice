@@ -1,6 +1,7 @@
 
 import  {Application ,Request,Response} from 'express'
 import statusCodes from 'http-status-codes'
+import errorHandler from '../middlewares/error.middleware'
 
 export const MainAuthRouter = (expressApp : Application) => {
     
@@ -14,4 +15,6 @@ export const MainAuthRouter = (expressApp : Application) => {
             message : `The Requested ${req.originalUrl} Does not Exists on the System`
         })
     })
+    
+    expressApp.use(errorHandler as any)
 }
