@@ -37,6 +37,16 @@ class AuthController {
             next(err)
         }
     }
+
+    public LogoutUser = async (req:Request,res:Response,next:NextFunction) : Promise<void> => {
+            try{
+                const accessToken = req.user.accessToken
+                const apiResponse = await this.authServices.logOutServices(accessToken as string)
+                sendApiResposne(res,apiResponse,`Log out Successfully`) 
+            }catch(err){
+                next(err)
+            }
+    }
 }
 
 

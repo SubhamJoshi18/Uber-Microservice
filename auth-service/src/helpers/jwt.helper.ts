@@ -4,6 +4,8 @@ import { JsonWebTokenExceptions } from '../exceptions/index'
 import { uberLogger } from '../libs/common.logger'
 import { IPayloadBody,ServiceEnum } from '../interfaces/auth.interface'
 
+
+  
 class JsonWebTokenHelper {
 
     private checkJwtPayload (payload : Omit<IPayloadBody,'phoneNumber'> , options : jwt.SignOptions , accessSecretToken : string | undefined) {
@@ -63,6 +65,27 @@ class JsonWebTokenHelper {
                 throw err
             }
         })
+    }
+
+
+    public async verifyToken(token : string, serviceType : ServiceEnum) {
+        
+        let validToken = true
+        const secretKey = this.getServiceToken(serviceType)
+
+        return new Promise((resolve,_reject) => {
+            try{    
+                const decodedPayload = jwt.verify(token as string,secretKey as jwt.Secret)
+                if(Object.entries(decodedPayload).length > 0) {
+                    if(validToken){
+                        resolve(decodedPayload)
+                    }
+                }
+            }catch(err){
+                throw new JsonWebTokenExceptions(err.message)
+            }
+        })
+        
     }
 }
 

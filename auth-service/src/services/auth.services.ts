@@ -1,15 +1,17 @@
 import { ILoginBody, IRegisterBody, ServiceEnum } from "../interfaces/auth.interface"
 import AuthRepository from "../repository/auth.repository"
-import { BadExceptions, DatabaseExceptions } from "../exceptions/index"
+import { BadExceptions, DatabaseExceptions, ValidationExceptions } from "../exceptions/index"
 import BcryptHelper from "../helpers/bcrypt.helper"
 import { isNullorUndefined, isTrue } from '../utils/transformData'
 import { uberLogger } from "../libs/common.logger"
 import JsonWebTokenHelper from "../helpers/jwt.helper"
+import BlockListRepository from "../repository/blockList.repository"
 
 
 class AuthService {
 
     private authRepository : AuthRepository = new AuthRepository()
+    private tokenRepository : BlockListRepository = new BlockListRepository()
     private bcryptHelper : BcryptHelper = new BcryptHelper()
     private jwtHelper : JsonWebTokenHelper = new JsonWebTokenHelper()
     
@@ -93,6 +95,22 @@ class AuthService {
             }
         }
 
+    }
+
+
+    public async logOutServices (token : string) {
+        
+        const isTokenExists = await this.tokenRepository.findToken(token as string)
+
+        if(isTokenExists || isTokenExists !== null) {
+            throw new ValidationExceptions(`The Token Already Exists , Please Try again`)
+        }
+        const savedResult =  await this.tokenRepository.createToken(token as string)
+        
+        return {
+            status : savedResult.isBlockList,
+            message : `The Token Has been Listed On BlockList, Loggin you Out`
+        }
     }
 }
 
