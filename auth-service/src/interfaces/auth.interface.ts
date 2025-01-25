@@ -7,7 +7,10 @@ export interface IRegisterBody {
     phoneNumber
 }
 
-
+export interface ILoginBody {
+    username : string
+    password : string
+}
 
 export interface IPayloadBody {
     _id : any

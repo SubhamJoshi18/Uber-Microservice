@@ -6,6 +6,7 @@ import { isValidPublicUrl } from '../middlewares/route.middleware'
 const authRouter  : Router = Router()
 
 authRouter.post('/register',isValidPublicUrl,AuthController.registerUser)
+authRouter.post('/login',isValidPublicUrl,AuthController.loginUser)
 
 
 

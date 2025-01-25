@@ -34,7 +34,7 @@ class JsonWebTokenHelper {
 
         const options : jwt.SignOptions= {
             issuer : 'Uber Shubham',
-            expiresIn : '1h',
+            expiresIn : serviceType.startsWith("r") ?  '24h' : '1h',
         }
 
         const accessSecretToken = this.getServiceToken(serviceType)

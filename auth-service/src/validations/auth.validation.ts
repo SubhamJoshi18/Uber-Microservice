@@ -52,13 +52,13 @@ const loginSchemaBody = Joi.object({
       password: Joi.string()
       .min(8)
       .max(128)
-      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'))
+      // .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'))
       .required()
       .messages({
         'string.empty': 'Password is required.',
         'string.min': 'Password must be at least 8 characters long.',
         'string.max': 'Password cannot exceed 128 characters.',
-        'string.pattern.base': 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+        // 'string.pattern.base': 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
       }),
 })
 
