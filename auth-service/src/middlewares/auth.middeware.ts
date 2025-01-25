@@ -12,9 +12,6 @@ declare global {
     }
   }
 
-
-
-
 export const verifyAuthToken = async  (req:Request,_res:Response,next:NextFunction) => {
     const jwtHelper = new JsonWebTokenHelper()
     try{

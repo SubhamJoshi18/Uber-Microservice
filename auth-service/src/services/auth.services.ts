@@ -2,16 +2,21 @@ import { ILoginBody, IRegisterBody, ServiceEnum } from "../interfaces/auth.inter
 import AuthRepository from "../repository/auth.repository"
 import { BadExceptions, DatabaseExceptions, ValidationExceptions } from "../exceptions/index"
 import BcryptHelper from "../helpers/bcrypt.helper"
-import { isNullorUndefined, isTrue } from '../utils/transformData'
+import { createUrlToken, get24HoursAheadFormatted, isNullorUndefined, isTrue } from '../utils/transformData'
 import { uberLogger } from "../libs/common.logger"
 import JsonWebTokenHelper from "../helpers/jwt.helper"
 import BlockListRepository from "../repository/blockList.repository"
+import { generateRandomUuid } from "../utils/transformData"
+import TokenRepository from "../repository/token.repository"
+import { sendEmail } from "../libs/smtp.libs"
+import { generateHtmlContent, subject } from "../constants/mock"
 
 
 class AuthService {
 
     private authRepository : AuthRepository = new AuthRepository()
     private tokenRepository : BlockListRepository = new BlockListRepository()
+    private uuidRepository : TokenRepository = new TokenRepository()
     private bcryptHelper : BcryptHelper = new BcryptHelper()
     private jwtHelper : JsonWebTokenHelper = new JsonWebTokenHelper()
     
@@ -112,6 +117,85 @@ class AuthService {
             message : `The Token Has been Listed On BlockList, Loggin you Out`
         }
     }
+
+    public async forgetPasswordServices ({email} : {email : string}) {
+
+        const isValidEmail =  await Promise.allSettled([this.authRepository.findOneEmail(email as string)])
+        
+        const isRejectedFree = isValidEmail.every((item : any) => item.status === 'fulfilled')
+
+        if(!isRejectedFree) {
+            const rejectedError =  isValidEmail.flatMap((item:any) => item.value)
+            throw new DatabaseExceptions(rejectedError[0])
+        }
+
+        const emailValue = Array.isArray(isValidEmail) && (isValidEmail[0].status === 'fulfilled' && isValidEmail[0].value !== null )? isValidEmail[0].value : null
+
+        if(!emailValue) {
+            throw new DatabaseExceptions(`The email you requested does not exists on the system, Please Try again...`)
+        }
+
+        const uuidToken = generateRandomUuid()
+        const forwadedDate = get24HoursAheadFormatted()
+        const savedDocuments = await this.uuidRepository.createToken(uuidToken,forwadedDate)
+        const validUrl = createUrlToken(savedDocuments.token as string,emailValue._id)
+        try{
+            if(savedDocuments && validUrl.length > 0) { 
+                const htmlContent = generateHtmlContent(validUrl)
+                    await sendEmail(email,subject,'',htmlContent)
+            }
+        }catch(err){
+            uberLogger.error(`Error Sending Message to the Simple Mail Transfer Protocol..`)
+            throw err
+        }
+        return {
+            message : `Reset Password Link is sended Sucessfully on ${validUrl}`
+        }
+    }
+
+
+    public async checkResetLink(token : string) {
+        const isTokenExists = await this.uuidRepository.findToken(token as string)
+        if(!isTokenExists) {
+            throw new DatabaseExceptions(`Token Does not exists , Please Try Again`)
+        }
+        const currentDate = new Date()
+        const tokenDate   = new Date(isTokenExists.expiresIn)
+        
+        const greaterThanCurrentDate=  currentDate > tokenDate
+        
+        if(greaterThanCurrentDate){
+            throw new DatabaseExceptions(`The Token has Already Been Expired , Please Try again with a new Token`)
+        }
+        return {
+            tokenExpirationTime: new Date(isTokenExists.expiresIn)
+        }
+    }
+
+    public async ResetPassword (userId : any , {password} : {password : string}) {
+        
+        const userDocument  = await this.authRepository.findOneId(userId as any)
+        if(!userDocument){
+            throw new DatabaseExceptions(`The User Does not Exist, Please Try again...`)
+        }
+        const userOldPassword = Object.entries(userDocument).length > 0 ? userDocument.password : ''
+
+        if(userOldPassword.length > 0 && !isNullorUndefined(userOldPassword)) {
+                const isMatchOld = await this.bcryptHelper.compareOldPassword(password as string,userOldPassword)
+                
+                if(isMatchOld){
+                    throw new DatabaseExceptions(`The Password You Entered Match with the Old Password ,Try a New Password`)
+                }
+
+                const hashPassword = await this.bcryptHelper.hashPassword(password)
+                const savedResult = await this.authRepository.saveData({password : hashPassword})
+                return savedResult
+        }   
+        return {
+            message : `The Password is not operational or it is invalid, Please Try Again`
+        }
+    }
 }
+
 
 export default AuthService

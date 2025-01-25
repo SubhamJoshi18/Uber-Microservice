@@ -10,6 +10,13 @@ class AuthRepository {
         return existsDocument
     }
 
+    async findOneId(value : any) {
+        const existsDocument = await User.findOne({
+            _id : value
+        })
+        return existsDocument
+    }
+
     async findOneUsername(value : string){
         const existsDocument = await User.findOne({
             username : value
@@ -30,6 +37,10 @@ class AuthRepository {
             ...data
         })
         return savedResult
+    }
+
+    async saveData(data:any | object){
+        return await User.create({...data})
     }
  
 }

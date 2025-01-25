@@ -6,5 +6,6 @@ export const privateUrl = {
 
 export const publicUrl = {
     register  : `${EXPRESS_APP_URL}/auth/register`,
-    login : `${EXPRESS_APP_URL}/auth/login`
+    login : `${EXPRESS_APP_URL}/auth/login`,
+    forgetPassword : `${EXPRESS_APP_URL}/auth/forget-password`
 }

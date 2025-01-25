@@ -62,7 +62,37 @@ const loginSchemaBody = Joi.object({
       }),
 })
 
+
+
+const forgetPasswordSchema  = Joi.object({
+  email: Joi.string()
+  .email()
+  .required()
+  .messages({
+    'string.base': 'Email must be a string.',
+    'string.empty': 'Email is required.',
+    'string.email': 'Email must be a valid email address.',
+  }),
+})
+
+
+const resetPasswordSchema = Joi.object({
+    password: Joi.string()
+    .min(8)
+    .max(128)
+    // .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'))
+    .required()
+    .messages({
+      'string.empty': 'Password is required.',
+      'string.min': 'Password must be at least 8 characters long.',
+      'string.max': 'Password cannot exceed 128 characters.',
+      // 'string.pattern.base': 'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
+    }),
+})
+
 export  {
     registerUserSchema,
-    loginSchemaBody
+    loginSchemaBody,
+    forgetPasswordSchema,
+    resetPasswordSchema
 }

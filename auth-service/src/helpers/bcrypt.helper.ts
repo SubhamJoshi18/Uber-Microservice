@@ -18,6 +18,11 @@ class BcryptHelper {
     public async compareHashPassword (rawPassword : string, dbPassword : string) {
         return await bcrypt.compare(rawPassword,dbPassword)
     }
+
+    public async compareOldPassword (rawPassword : string, oldPassword : string) {
+        const isMatch = await this.compareHashPassword(rawPassword,oldPassword)
+        return typeof(isMatch) === 'boolean' && isMatch !== false
+    }
     
 }
 
