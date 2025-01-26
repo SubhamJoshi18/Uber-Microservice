@@ -1,5 +1,6 @@
 import { IRegisterBody } from "../interfaces/auth.interface"
 import User from "../database/models/user.models"
+import userProfileModel from "../database/models/userProfile.models"
 
 class AuthRepository {
 
@@ -36,6 +37,14 @@ class AuthRepository {
         const savedResult = await User.create({
             ...data
         })
+
+        const newProfile = await userProfileModel.create({
+            user : savedResult._id
+        })
+
+        savedResult.userProfile = newProfile._id
+        await savedResult.save()
+
         return savedResult
     }
 

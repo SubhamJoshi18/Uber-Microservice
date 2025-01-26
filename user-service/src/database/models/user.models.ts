@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema({
         enum : ['user','rider'],
         default : 'user'
     },
-
     userProfile : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'UserProfile',
