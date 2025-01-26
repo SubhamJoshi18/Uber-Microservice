@@ -10,11 +10,9 @@ export const userProfileMapper = (userDocument : any,profileDocument : any) => {
        const filteredObject = Object.fromEntries(
         Object.entries(concatObject).filter(([key]) => !keyToRemoved.includes(key))
       );
-      
       return filteredObject;
 
 }
-
 const generateValidObject = (prefixId : string, document : any | object) => {
     const nestedDoc = document._doc
     const responseObject = {}

@@ -13,6 +13,34 @@ class UserProfileRepository {
         return existsDoc
     }
 
+    async findEmail(email : string) {
+        const existsEmail = await User.findOne({
+            email : email
+        })
+        return existsEmail
+    }
+
+    async UploadPhoto(userId : string | mongoose.Schema.Types.ObjectId, photoUrl : string) {
+        const savedResult = await userProfileModel.updateOne({
+            user : userId
+        },{
+            image : photoUrl
+        },
+    {
+        $new : true
+    })
+    return savedResult
+    }
+
+    async deletePhoto(userId : string) {
+        const deleteResult = await userProfileModel.updateOne({
+          user : userId
+        },{
+            image : ''
+        })
+        return deleteResult
+    }
+
     async findUserProfileid(profileId : string) {
         const existsDoc = await userProfileModel.findOne({
             _id : profileId as string
@@ -21,13 +49,8 @@ class UserProfileRepository {
     }
 
 
-    async updateProfile (userId:string | mongoose.Schema.Types.ObjectId,validObject : object) {
-        const isObjectEmpty = Object.entries(validObject).length === 0
-        if(isObjectEmpty){
-            return {
-                message : `Nothing to be Updated`
-            }
-        }
+
+    async updateProfile (userId:string | mongoose.Schema.Types.ObjectId,validObject : object)  : Promise<mongoose.UpdateWriteOpResult>{
         const updatedResult = await userProfileModel.updateOne({
             user : userId
         }, {

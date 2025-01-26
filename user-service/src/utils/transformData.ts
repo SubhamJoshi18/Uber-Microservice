@@ -49,3 +49,17 @@ export const createUrlToken = (uuidToken:string,userId : any) => {
 export const checkItHasProfile = (userDoc : object | any) => {
     return userDoc['userProfile']
 }
+
+export const deepCopyObject = (validObject : object) => {
+    return JSON.parse(JSON.stringify({...validObject}))
+}
+
+export const renameSecondaryEmail = (validObject : object) => {
+    let newFilteredObject = {}
+    if (validObject.hasOwnProperty('secondaryEmail')){
+            const emailContent = validObject['secondaryEmail']
+            delete validObject['secondaryEmail']
+            newFilteredObject['SecondaryEmail'] = emailContent
+     }
+     return Object.assign(validObject,newFilteredObject)
+}
