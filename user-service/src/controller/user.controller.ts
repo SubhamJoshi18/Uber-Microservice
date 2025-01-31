@@ -7,7 +7,6 @@ import { IUploadPhoto } from './types'
 
 class UserController {
 
-
     public async getUserProfiles(req:Request,res:Response,next:NextFunction) {
         try{
              const userId = req.user._id
@@ -17,8 +16,6 @@ class UserController {
             next(err)
         }
     }
-
-
     public async updateUserProfile(req:Request,res:Response,next:NextFunction) {
             try{
                 const userId = req.user._id
