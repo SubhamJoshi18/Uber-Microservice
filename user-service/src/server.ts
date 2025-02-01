@@ -4,6 +4,7 @@ import MainUserApp from "./app";
 import http from 'http'
 import { uberLogger } from "./libs/common.logger";
 import SingeltonMongoConnection from "./database/connect";
+import { initQueueConsumer } from "./queues/mainQueue";
 
 const port = convertNumber(getEnvValue('PORT'))?? 3002
 const mongoUrl = getEnvValue('MONGO_URL')
@@ -18,8 +19,10 @@ const server = http.createServer(expressApp as any)
 server.listen(port,() => {
     try{
         mongoInstance.getSingeltonConnecition().then(() => {
-            uberLogger.info(`Mongo DB is Connected Successfully....`)
-            uberLogger.info(`User Microservice has been Started on http://localhost:${port}`)
+            initQueueConsumer().then(() => {
+                uberLogger.info(`Mongo DB is Connected Successfully....`)
+                uberLogger.info(`User Microservice has been Started on http://localhost:${port}`)
+            })
         }).catch((err) => {
             uberLogger.error(`Error Connecting to the MongoDB Database`,err)
         })

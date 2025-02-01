@@ -23,6 +23,27 @@ class HttpExceptions extends Error {
     }
 }
 
+class AMQPConnectionExcepitions extends Error {
+    public statusCode: number
+    public status : string = 'NOT Found'
+
+    constructor(message :string,statusCode :number) {
+        super(message)
+        this.name = 'AMQP Connection Error'
+        this.statusCode = statusCode
+        this.status = statusCode.toString().startsWith('4') ? 'NOT Found' : 'Connected'
+        Object.setPrototypeOf(this,new.target.prototype)
+    }
+
+    getStatusCode() : number {
+        return this.statusCode
+    }
+    
+    getStatus() : string {
+        return this.status
+    }
+}
+
 
 
 class DatabaseExceptions extends HttpExceptions {
@@ -63,5 +84,6 @@ export {
     DatabaseExceptions,
     ValidationExceptions,
     HttpExceptions,
-    JsonWebTokenExceptions
+    JsonWebTokenExceptions,
+    AMQPConnectionExcepitions
 }
