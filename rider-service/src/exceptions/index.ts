@@ -1,6 +1,27 @@
 import statusCodes from 'http-status-codes'
 
 
+class AMQPConnectionExcepitions extends Error {
+    public statusCode: number
+    public status : string = 'NOT Found'
+
+    constructor(message :string,statusCode :number) {
+        super(message)
+        this.name = 'AMQP Connection Error'
+        this.statusCode = statusCode
+        this.status = statusCode.toString().startsWith('4') ? 'NOT Found' : 'Connected'
+        Object.setPrototypeOf(this,new.target.prototype)
+    }
+
+    getStatusCode() : number {
+        return this.statusCode
+    }
+    
+    getStatus() : string {
+        return this.status
+    }
+}
+
 class HttpExceptions extends Error {
     
     public statusCode : number
@@ -34,6 +55,7 @@ class DatabaseExceptions extends HttpExceptions {
 }
 
 
+
 class ValidationExceptions extends HttpExceptions {
     constructor(message : string, statusCode=statusCodes.BAD_REQUEST){
         super(message,statusCode)
@@ -63,5 +85,6 @@ export {
     DatabaseExceptions,
     ValidationExceptions,
     HttpExceptions,
-    JsonWebTokenExceptions
+    JsonWebTokenExceptions,
+    AMQPConnectionExcepitions
 }
