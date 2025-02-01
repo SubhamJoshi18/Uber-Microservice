@@ -1,6 +1,6 @@
 
 
-const createConfig = (...configData : Array<string>) => {
+const createConfig = (...configData : Array<string>)  : {} => {
     const queueConfig = {
         queueName : '',
         queueExchange: '',
