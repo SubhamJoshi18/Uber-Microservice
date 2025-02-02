@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
     userProfile : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'UserProfile',
+    },
+
+    rider : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'Rider',
     }
 },
 {

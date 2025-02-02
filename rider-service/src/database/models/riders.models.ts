@@ -35,7 +35,14 @@ const riderModel = new mongoose.Schema({
     totalEarn : {
         type : Number,
         default : 0 
-    }
+    },
+
+    riderHistory : [
+        {
+            type : mongoose.Schema.Types.ObjectId,
+            ref : 'User'
+        }
+    ]
 
 }) 
 

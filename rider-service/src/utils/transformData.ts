@@ -63,3 +63,8 @@ export const renameSecondaryEmail = (validObject : object) => {
      }
      return Object.assign(validObject,newFilteredObject)
 }
+
+
+export const checkObjectSize = (validObj : object) => {
+    return Object.entries(validObj).length > 0
+}
