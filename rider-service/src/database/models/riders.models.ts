@@ -42,7 +42,13 @@ const riderModel = new mongoose.Schema({
             type : mongoose.Schema.Types.ObjectId,
             ref : 'User'
         }
-    ]
+    ],
+
+
+    riderReport : [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'RiderReport'
+    }]
 
 }) 
 
