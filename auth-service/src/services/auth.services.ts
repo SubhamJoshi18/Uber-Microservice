@@ -81,7 +81,8 @@ class AuthService {
                  _id : existsUsername._id,
                  username : existsUsername.username,
                  email : existsUsername.email,
-                 phoneNumber : existsUsername.phoneNumber
+                 phoneNumber : existsUsername.phoneNumber,
+                 role : existsUsername.role
             })
 
             const accessToken = await this.jwtHelper.createToken(payload,ServiceEnum.ACCESS_TOKEN)
