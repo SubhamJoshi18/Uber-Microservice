@@ -22,7 +22,7 @@ export const createGenericChannel = async  (amqpConfig : IAMQPConfig, queueConfi
 
         const isValidConfig = Array.isArray(filterdRejected) && filterdRejected.length > 0
 
-        if(!isValidConfig){
+        if(isValidConfig){
             throw new AMQPConnectionExcepitions(`Config Does not meet Requirements`,404)
         }
 

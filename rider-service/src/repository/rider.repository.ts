@@ -13,10 +13,10 @@ class RiderRepository {
     }
     async saveResult (userId : mongoose.Schema.Types.ObjectId , riderPayload:IRiderBody){
         const savedResult = await Rider.create({
-            ...riderPayload
+            riderName : riderPayload['riderName'],
+            user : userId
         })
-        savedResult.user = userId as any
-        await savedResult.save()
+
         return savedResult
     }
     async findRiderUserId (userId : any) {

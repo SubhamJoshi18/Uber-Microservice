@@ -7,7 +7,7 @@ const riderRouter = Router()
 
 
 //Rider Management
-riderRouter.post('/rider',isValidPrivateUrl,verifyAuthToken,RiderController.createRider)
+riderRouter.post('/rider',verifyAuthToken,RiderController.createRider)
 riderRouter.get('/rider',isValidPrivateUrl,verifyAuthToken,RiderController.getRider)
 riderRouter.get('/rider/filter',isValidPrivateUrl,verifyAuthToken,RiderController.advanceFilter)
 

@@ -93,7 +93,6 @@ class RidesServices {
             }
             return savedResult
         }
-
     }   
 }
 

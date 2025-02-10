@@ -61,6 +61,19 @@ class UserProfileRepository {
         return updatedResult
     }
 
+
+    async updateUserRiderId(userId: any , riderId : any) : Promise<any> {
+        const updatedResult = await User.updateOne({
+            _id : userId
+            },{
+               rider : riderId
+        },
+        {
+            $new : true
+        })
+    return updatedResult
+    }
+
 }
 
 export default UserProfileRepository

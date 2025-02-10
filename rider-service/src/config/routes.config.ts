@@ -10,10 +10,10 @@ export const publicUrl = {
 
 
 export const privateUrl = {
-    createRider : `${EXPRESS_APP_URL}/rider`,
-    editRider : `${EXPRESS_APP_URL}/rider`,
-    getRiderProfile : `${EXPRESS_APP_URL}/rider`,
-    createFlare : `${EXPRESS_APP_URL}/rider/flare`,
-    approveFlare : `${EXPRESS_APP_URL}/rider/flare/:flareId`,
-    riderHistory : `${EXPRESS_APP_URL}/rider/history`
+    createRider : `${EXPRESS_APP_URL}/api/rider`,
+    editRider : `${EXPRESS_APP_URL}/api/rider`,
+    getRiderProfile : `${EXPRESS_APP_URL}/api/rider`,
+    createFlare : `${EXPRESS_APP_URL}/api/rider/flare`,
+    approveFlare : `${EXPRESS_APP_URL}/api/rider/flare/:flareId`,
+    riderHistory : `${EXPRESS_APP_URL}/api/rider/history`
 }

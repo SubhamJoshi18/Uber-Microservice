@@ -46,6 +46,11 @@ const riderReportSchema = Joi.object({
     }),
 })
 
+// const createFlareSchema = Joi.object({
+//   flareMoney : Joi.number(),
+//   flareComment : Joi.string().optional()
+// })
+
 export {
     createRiderSchema,
     riderReportSchema,

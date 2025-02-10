@@ -23,7 +23,7 @@ export const isValidPublicUrl = (req:Request,res:Response,next:NextFunction)  : 
 export const isValidPrivateUrl = (req:Request,res:Response,next:NextFunction) : any => {
      let expressUrl = EXPRESS_APP_URL
      const currentUrl = req.url ?? req.originalUrl
-     const originalParams = expressUrl.concat(`/rider/${currentUrl}`)
+     const originalParams = expressUrl.concat(`/api/rider/${currentUrl}`)
      const privateWhitlist = Object.values(privateUrl)
 
      if(privateWhitlist.includes(originalParams)) {

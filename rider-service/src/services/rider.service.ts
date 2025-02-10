@@ -1,15 +1,18 @@
 import { IRiderBody, IRiderFilter } from '../controller/types'
 import RiderRepository from '../repository/rider.repository'
 import { DatabaseExceptions } from '../exceptions/index'
-import MainQueueManager from '../queues/mainQueueManager'
+// import MainQueueManager from '../queues/mainQueueManager'
 import { userConfig } from '../config/queue.config'
 import { uberLogger } from '../libs/common.logger'
-import { IQueueConfig } from '../queues/types'
+// import { IQueueConfig } from '../queues/types'
 import { mapRiderAndUser } from '../mappers/rider.mappers'
 import mongoose from 'mongoose'
 import UserRepository from '../repository/user.repository'
 import { checkObjectSize, isTrue } from '../utils/transformData'
 import RiderReportRepository from '../repository/riderReport.repository'
+import { extractRiderPayload } from '../extractor/riderExtractor'
+import { publishRiderToUser } from '../queues/producer/userPublisher'
+import MainQueueManager from '../queues/mainQueueManager'
 
 
 
@@ -17,12 +20,12 @@ class RiderService  {
 
     private riderRepository : RiderRepository
     private userRepository : UserRepository
-    private amqpServices : MainQueueManager
+    // private amqpServices : MainQueueManager
     private riderReportRepository : RiderReportRepository
 
     constructor(){
         this.riderRepository = new RiderRepository()
-        this.amqpServices = new MainQueueManager()
+        // this.amqpServices = new MainQueueManager()
         this.userRepository = new UserRepository()
         this.riderReportRepository = new RiderReportRepository()
     }
@@ -40,8 +43,11 @@ class RiderService  {
         }
         const isSaved = await this.riderRepository.saveResult(userId as unknown as mongoose.Schema.Types.ObjectId ,{...parseBody})
         try{
+            const channel = await MainQueueManager.createGenericChannel(userConfig)
+            const extractedPayload = Object.assign(extractRiderPayload(isSaved),{user_id:userId})
             uberLogger.info(`Publishing Payload : ${JSON.stringify(isSaved)} to the ${userConfig['queueName']}`)
-            await this.amqpServices.publishMessage(isSaved,userConfig as IQueueConfig)
+            await publishRiderToUser(channel,userConfig as any,extractedPayload)
+            
         }catch(err){
             uberLogger.error(`Error while publishing payload : ${JSON.stringify(isSaved)}`)
             throw err
@@ -310,4 +316,4 @@ class RiderService  {
 }
 
 
-export default RiderService
+export default new RiderService()

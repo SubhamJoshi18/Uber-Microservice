@@ -6,7 +6,7 @@ import riderRouter from './rider.routes'
 
 export const MainRiderRouter = (expressApp : Application) => {
     
-    expressApp.use('/user',[riderRouter])
+    expressApp.use('/api',[riderRouter])
     
     expressApp.use(errorHandler as any)
     
