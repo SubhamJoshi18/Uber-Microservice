@@ -3,10 +3,11 @@ import  {Application ,Request,Response} from 'express'
 import statusCodes from 'http-status-codes'
 import errorHandler from '../middlewares/error.middleware'
 import riderRouter from './rider.routes'
+import riderFlareRouter from './riderFlare.routes'
 
 export const MainRiderRouter = (expressApp : Application) => {
     
-    expressApp.use('/api',[riderRouter])
+    expressApp.use('/api',[riderRouter,riderFlareRouter])
     
     expressApp.use(errorHandler as any)
     
