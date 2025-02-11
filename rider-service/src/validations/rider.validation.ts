@@ -34,15 +34,11 @@ const updatedRiderSchema = Joi.object({
 const riderReportSchema = Joi.object({
   reportComment : Joi.string()
     .alphanum()
-    .min(3)
-    .max(30)
     .required()
     .messages({
       'string.base': 'Report Comment must be a string.',
       'string.empty': 'Report Comment is required.',
       'string.alphanum': 'Report Comment must only contain letters and numbers.',
-      'string.min': 'Report Comment  must be at least 3 characters long.',
-      'string.max': 'Report Comment  cannot exceed 30 characters.',
     }),
 })
 

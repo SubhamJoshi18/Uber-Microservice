@@ -47,7 +47,7 @@ class RiderRepository {
     async findRiderById(riderId : any) {
         const riderDocuments = await Rider.findOne({
             _id : riderId
-        })
+        }).populate('riderReport')
         return riderDocuments
     }
 
@@ -56,7 +56,9 @@ class RiderRepository {
         const  riderUpdatedResult = await Rider.updateOne({
             _id : riderId
         }, { 
-            $addToSet : {riderReport : reportedId}
+            $set : {
+                riderReport : [reportedId]
+            }
         })
         return riderUpdatedResult
     }

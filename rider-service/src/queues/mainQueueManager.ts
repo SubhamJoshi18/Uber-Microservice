@@ -8,13 +8,10 @@ import initQueueConsumer from './initQueueConsumer'
 
 
 class MainQueueManager {
-
-
-
     constructor() {
 
     }
-    
+
     public static async createAmqpConnection () : Promise<any> {
         let  connection : Connection
         let  channel : Channel

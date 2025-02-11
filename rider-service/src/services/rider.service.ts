@@ -57,7 +57,7 @@ class RiderService  {
 
     public async getRider(userId : string | mongoose.Schema.Types.ObjectId) {
 
-        const isUserValid = await this.userRepository.getUser(userId as string)
+        const isUserValid : any = await this.userRepository.getUser(userId as string)
 
         if(!isUserValid) {
             throw new DatabaseExceptions(`The User Does not Exist or The User is not a Rider`)
@@ -65,13 +65,17 @@ class RiderService  {
 
         const extractedId = isUserValid !== null ? isUserValid._id : null
 
-        const riderDoc = await this.riderRepository.findRiderUserId(extractedId as unknown as any)
+        const riderDoc : any = await this.riderRepository.findRiderUserId(extractedId as unknown as any)
 
         if(!riderDoc){
             throw new DatabaseExceptions(`The Rider Does not Exists on this Document, Rider Does not Been Created`)
         }
 
-        const mappedResult = mapRiderAndUser(isUserValid,riderDoc)
+        const actualUserDoc = isUserValid._doc
+        const actualRiderDoc = riderDoc._doc
+     
+
+        const mappedResult = mapRiderAndUser(actualUserDoc,actualRiderDoc)
         return mappedResult
     }
 
@@ -147,7 +151,7 @@ class RiderService  {
         }
     }
 
-    public async reportRider(riderId : mongoose.Schema.Types.ObjectId, comments : {riderComment : string}){
+    public async reportRider(riderId : mongoose.Schema.Types.ObjectId, comments : {reportComment : string}){
     
         const riderExists = await this.riderRepository.findRiderById(riderId as unknown as any)
 
@@ -156,13 +160,13 @@ class RiderService  {
             throw new DatabaseExceptions(`The Rider You are Trying to Report Does not Exists`)
         }
         
-        const riderComment = Object.entries(comments).length > 0 ? comments.riderComment : ''
+        const riderComment = Object.entries(comments).length > 0 ? comments.reportComment : ''
         const checkReportExists = riderExists.riderReport !== null ? riderExists.riderReport : null
         
-        if(!checkReportExists) {
+        if(checkReportExists?.length === 0) {
             uberLogger.info(`The Rider Has Not Received any Report till now, Publishing One Report to the Report`)
             const reportRider = await this.riderReportRepository.publishReport(riderId as unknown as any,riderComment)
-            const reportedRiderId = reportRider.hasOwnProperty('_id') ?reportRider._id : null
+            const reportedRiderId = reportRider._id
             const savedReportedId = await this.riderRepository.pushRiderReportedIdToRider(riderId as unknown as any,reportedRiderId)
             return savedReportedId
         }
@@ -265,12 +269,6 @@ class RiderService  {
 
         const isExistsHistory = riderDocuments.hasOwnProperty('_id') ? riderDocuments.riderHistory : []
         
-        const isValidHistory = Array.isArray(isExistsHistory) && isExistsHistory.length.toString().startsWith('0')
-
-        if(isValidHistory){
-            throw new DatabaseExceptions(`Rider History does not Exists, Please Verify if this is the Correct Rider`)
-        }
-
 
         const isAlreadyZero = isExistsHistory.length.toString().startsWith('0')
 

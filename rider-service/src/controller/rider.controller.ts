@@ -1,6 +1,6 @@
 import {Request,Response,NextFunction} from 'express'
 import RiderService from "../services/rider.service"
-import { createRiderSchema, riderReportSchema, updatedRiderSchema } from '../validations/rider.validation'
+import { createRiderSchema, updatedRiderSchema } from '../validations/rider.validation'
 import { validateBody } from  '../libs/handlers/validator'
 import { sendApiResposne } from '../utils/genericResponse'
 import { IRiderBody, IRiderFilter } from './types'
@@ -64,8 +64,7 @@ class RiderController {
         try{
             const riderId = req.params.riderId
             const contents = req.body
-            const parseComment = validateBody(contents,riderReportSchema)
-            const apiResponse = await RiderService.reportRider(riderId as unknown as any,parseComment as {riderComment : string})
+            const apiResponse = await RiderService.reportRider(riderId as unknown as any,contents as {reportComment : string})
             sendApiResposne(res,apiResponse,`The Rider has been Reported Successfully`)
         }catch(err){
             next(err)
@@ -97,7 +96,7 @@ class RiderController {
         try{
             const userId = req.user._id
             const apiResponse = await RiderService.clearRiderHistory(userId as string)
-            sendApiResposne(res,apiResponse,`The Histry has been cleared`)
+            sendApiResposne(res,apiResponse,`The History has been cleared`)
         }catch(err){
             next(err)
         }

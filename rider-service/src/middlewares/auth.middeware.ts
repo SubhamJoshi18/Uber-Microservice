@@ -35,6 +35,7 @@ export const verifyAuthToken = async  (req:Request,_res:Response,next:NextFuncti
 }
 
 
+
 const extractHeaderToken = (reqHeaders : Request) => {
         const token =  reqHeaders.headers.authorization ?? reqHeaders.headers['authorization']
         if(!token){

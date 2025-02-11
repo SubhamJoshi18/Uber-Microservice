@@ -12,6 +12,8 @@ const riderReportSchema = new mongoose.Schema({
         required: [true,formattedMongooseMessage('Rider')]
     }
 
+},{
+    timestamps : true
 })
 
 

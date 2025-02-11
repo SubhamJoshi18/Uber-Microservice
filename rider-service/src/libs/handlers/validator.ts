@@ -9,6 +9,7 @@ export const validateBody = (schemaBody : object , schemaStructure : any) : obje
         }
         return Object.values(value).length > 0 ? value : {}
     }catch(err){
+        console.log(err)
         throw err
     }
 }
