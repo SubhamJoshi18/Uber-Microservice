@@ -8,10 +8,6 @@ import { sendApiResposne } from '../utils/genericResponse'
 
 class RidesController {
 
-    private ridesService : RidesServices
-    constructor() {
-        this.ridesService = new RidesServices()
-    }
 
 
 
@@ -20,7 +16,7 @@ class RidesController {
             const userId = req.user._id
             const content = req.body
             const parseContent = validateBody(content,createRidesSchema)
-            const apiResponse = await this.ridesService.createRideServices(userId as userMongoId, parseContent as ICreateRider)
+            const apiResponse = await RidesServices.createRideServices(userId as userMongoId, parseContent as ICreateRider)
             sendApiResposne(res,apiResponse,`The Ride has been Requested`)
         }catch(err){
             next(err)

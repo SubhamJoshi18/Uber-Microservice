@@ -1,6 +1,5 @@
 import { AMQPConnectionExcepitions, DatabaseExceptions, ValidationExceptions } from '../exceptions/index'
 import { ICreateRider,userMongoId } from "../controller/types"
-import MainQueueManager from '../queues/mainQueueManager'
 import UserRepository from '../repository/user.repository'
 import { isMatchLength } from '../utils/transformData'
 import { isMatchString } from '../utils/transformData'
@@ -8,20 +7,22 @@ import RidesRepository from '../repository/rides.repository'
 import { publishMessageToRider } from '../queues/producer/riderPublisher'
 import { riderConfig } from '../config/queue.config'
 import { IQueueConfig } from '../queues/types'
+import MainQueueManager from '../queues/mainQueueManager'
+
 
 class RidesServices {
-    private amqpServices : MainQueueManager
+
     private userRepository : UserRepository
     private ridesRepository : RidesRepository
 
     constructor(){
-        this.amqpServices = new MainQueueManager()
+  
         this.userRepository = new UserRepository()
         this.ridesRepository = new RidesRepository()
     }
 
     public async createRideServices(userId : userMongoId, parseBody : ICreateRider) : Promise<any|void> {
-        const riderChannel = this.amqpServices.getChannel()
+        const riderChannel = await MainQueueManager.getChannel()
         const userDoc = await this.userRepository.findUserById(userId)
 
         if(typeof userDoc === 'object' && !userDoc) {
@@ -60,19 +61,22 @@ class RidesServices {
 
             const currentDate = new Date().toISOString()
             const savedPayload : {
+
                 ride_started_at : Date,
-                ride_rider : string,
+                ride_rider : any,
                 ride_user : userMongoId,
-                ride_money : number,
+                ride_money : any,
                 ride_current_location : string,
-                ride_destination_location : string
+                ride_destination_location : string,
+                ride_estimation_time : string
             } = {
                 ride_started_at : new Date(currentDate),
                 ride_rider : 'Not Assigned',
                 ride_user: userDoc._id as any,
                 ride_money : price,
                 ride_current_location : currentLocation,
-                ride_destination_location : destination
+                ride_destination_location : destination,
+                ride_estimation_time : 'Not Started'
             }
 
             const riderPayload  = {
@@ -80,15 +84,15 @@ class RidesServices {
                 rider_properties : savedPayload
             }
 
-            const savedResult =  this.ridesRepository.savedResult({...savedPayload})
-            const publishMessaged = publishMessageToRider(riderPayload,riderChannel,riderConfig as IQueueConfig)
+            const savedResult =  await this.ridesRepository.savedResult({...savedPayload})
+            const publishMessaged = publishMessageToRider(riderPayload,riderChannel as any,riderConfig as IQueueConfig)
 
             const callbackPromiseArr = await Promise.allSettled([
                 savedResult,
                 publishMessaged
             ])
             const filteredRejected = callbackPromiseArr.length > 0 ? callbackPromiseArr.filter((data:any) => data.status !== 'fulfilled') : []
-            if(filteredRejected.length.toString().startsWith('0')) {
+            if(!filteredRejected.length.toString().startsWith('0')) {
                 throw new AMQPConnectionExcepitions(`There is some error while publishing to the rider queue`,503)
             }
             return savedResult
@@ -96,4 +100,4 @@ class RidesServices {
     }   
 }
 
-export default RidesServices
+export default new RidesServices()

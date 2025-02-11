@@ -21,8 +21,10 @@ const createConfig = (...configData : Array<string>)  : {} => {
 
 const userConfig = createConfig('user-queue','user-exchange','user-rk')
 const riderConfig = createConfig('rider-queue','rider-exchange','rider-rk')
+const riderFlareConfig = createConfig('rider-flare-queue','rider-flare-exchange','rider-flare-rk')
 
 export {
     userConfig,
-    riderConfig
+    riderConfig,
+    riderFlareConfig
 }

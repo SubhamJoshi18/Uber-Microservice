@@ -2,12 +2,12 @@ import {Channel} from 'amqplib'
 
 
 
-const assertExchangeToQueue = async (channel : Channel,queueExchange: string,isDur=false) => {
-    return isDur ? await channel.assertExchange(queueExchange,'direct',{durable : isDur}) : await channel.assertExchange(queueExchange,'direct')
+const assertExchangeToQueue = async (channel : Channel,queueExchange: string) => {
+  await channel.assertExchange(queueExchange,'direct',{durable:true})
 }
 
-const assertQueueOrCheck = async (channel : Channel,queueName : string,isDur=false) => {
-    return  isDur ? await channel.assertQueue(queueName,{durable:isDur}) : await channel.assertQueue(queueName,{durable:isDur})
+const assertQueueOrCheck = async (channel : Channel,queueName : string) => {
+    await channel.assertQueue(queueName,{durable:true})
 }
 
 export {

@@ -3,7 +3,6 @@ import { UserRole } from '../constants/modules'
 import statusCodes from 'http-status-codes'
 
 export const isUser = (req:Request,res:Response,next:NextFunction) : any => {
-
         const userData = req.user
         const isRoleExists = userData.hasOwnProperty('role') ? userData.role : ''
         if(UserRole.includes(isRoleExists)){

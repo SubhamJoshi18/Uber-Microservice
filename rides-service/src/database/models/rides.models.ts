@@ -22,7 +22,6 @@ const ridesSchema = new mongoose.Schema({
 
     rider_name : {
         type : String,
-        required : [true,formattedMongooseMessage('Rider Name')]
     },
 
     ride_ended_at : {
@@ -45,13 +44,11 @@ const ridesSchema = new mongoose.Schema({
     ride_completed_at : {
         type : String,
         required : [true,formattedMongooseMessage('Ride Completed At')],
-        default : '0s'
+        default : 'Ride Not Started'
     },
 
     ride_rider : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'Rider',
-        required:[true,formattedMongooseMessage('Ride Rider')]
+        type : String,
     },
 
     ride_user : {

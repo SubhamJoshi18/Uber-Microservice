@@ -1,13 +1,9 @@
 import { Channel, ConsumeMessage } from 'amqplib';
 import { uberLogger } from '../../libs/common.logger'
-import { riderConfig } from '../../config/queue.config'
 import { IQueueConfig } from '../types';
+import { riderFlareConfig } from '../../config/queue.config';
 
-/**
- * Handles the incoming message.
- * @param msg The RabbitMQ message
- */
-const handleRiderMessage = (msg: ConsumeMessage | null) => {
+const handleRiderFlareConsumer = (msg: ConsumeMessage | null) => {
     if (!msg) {
         console.warn('Received null message');
         return;
@@ -23,12 +19,9 @@ const handleRiderMessage = (msg: ConsumeMessage | null) => {
     }
 };
 
-/**
- * Consumes messages from the RabbitMQ queue.
- * @param channel The AMQP channel
- */
-export const riderConsumer = async (channel: Channel, queueName: string) => {
-    const {queueExchange} : IQueueConfig | any =  riderConfig
+
+export const riderFlareConsumer = async (channel: Channel, queueName: string) => {
+    const {queueExchange} : IQueueConfig | any =  riderFlareConfig
     try {
 
         await channel.assertExchange(queueExchange,'direct',{durable:true})
@@ -38,7 +31,7 @@ export const riderConsumer = async (channel: Channel, queueName: string) => {
 
         uberLogger.info(`Waiting for Message in the ${queueName} Consumer`)
         channel.consume(queueName, (msg) => {
-            handleRiderMessage(msg);
+            handleRiderFlareConsumer(msg);
             if (msg) channel.ack(msg);
 
         });

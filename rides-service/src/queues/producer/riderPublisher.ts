@@ -6,7 +6,7 @@ import { assertExchangeToQueue,assertQueueOrCheck } from '../channelUtils'
 
 export const prepareRiderData = (validPayload : any | object) => {
         const payload = {
-            message : `The User has Requested Ride From ${validPayload.user.currentLocation} to the ${validPayload.user.destination} with the fare : ${validPayload.rider_properties.ride_money}`,
+            message : `The User has Requested Ride From ${validPayload.rider_properties.ride_current_location} to the ${validPayload.rider_properties.ride_destination_location} with the fare : ${validPayload.rider_properties.ride_money}`,
             userDetails : validPayload.user,
             riderDetails : validPayload.rider_properties
         }
