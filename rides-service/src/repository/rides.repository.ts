@@ -43,6 +43,13 @@ class RidesRepository {
             ...data
         })
     }
+
+    public async deleteRidesById(ridesId:any){
+        const deletedResult = await Rides.deleteOne({
+            _id : ridesId
+        })
+        return deletedResult
+    }
 }
 
 

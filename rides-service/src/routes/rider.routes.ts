@@ -7,6 +7,7 @@ const ridesRouter = Router()
 
 ridesRouter.post('/rides/create', verifyAuthToken,isUser,RidesController.createRides)
 ridesRouter.patch('/rides/accept/:offerId',verifyAuthToken,isUser,RidesController.acceptOffer)
+ridesRouter.patch('/rides/done/:offerId',verifyAuthToken,isUser,RidesController.completeTheRide)
 ridesRouter.get('/rides/:ridesId',verifyAuthToken,RidesController.getAllRidesOffer)
 
 

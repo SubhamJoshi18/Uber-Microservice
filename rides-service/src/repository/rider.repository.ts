@@ -9,6 +9,17 @@ class RiderRepository{
         })
         return allRiderResult?.riderName
     }
+
+    public async appendUserToHistory(userId : any, riderId : any) {
+        const updatedResult = await Rider.updateOne({
+            _id : riderId
+        },{
+            $set: {
+                riderHistory : [userId]
+            }
+        })
+        return updatedResult
+    }
 }
 
 

@@ -29,7 +29,6 @@ class RidesController {
            next(err)
         }
    }
-
    public async acceptOffer(req:Request,res:Response,next:NextFunction){
         try{
             const userId = req.user._id
@@ -40,8 +39,16 @@ class RidesController {
             }
             const apiResponse = await RidesServices.acceptOffer(idsobj)
             sendApiResposne(res,apiResponse,`The Ride has begin`)
-            
-
+        }catch(err){
+            next(err)
+        }
+   }
+   public async completeTheRide(req:Request,res:Response,next:NextFunction){
+        try{
+            const userId = req.user._id
+            const offerId = req.params.offerId
+            const apiResponse = await RidesServices.markAsComplete({userId,offerId})
+            sendApiResposne(res,apiResponse,`The Rides has been marked as Completed`)
         }catch(err){
             next(err)
         }

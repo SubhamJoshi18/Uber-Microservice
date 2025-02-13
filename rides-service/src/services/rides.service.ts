@@ -173,7 +173,11 @@ class RidesServices {
             const updatedResult = await this.ridesRepository.updateResult(extractedRidesId,payloadUpdate)
             const ackUpdated = clearOffers.acknowledged && updatedResult.acknowledged
             const payloadStatus = {
-                offerId
+                offerId,
+                body : {
+                    riderOffer : 'ACCEPTED',
+                    rideStart : true
+                }
             }
             
             try{
@@ -186,10 +190,85 @@ class RidesServices {
 
     }   
    
-    
+
+    public async markAsComplete(idsObj : {userId:any,offerId:any}) : Promise<any> {
+        const { userId , offerId } = idsObj 
+
+        const riderStatusChannel = await MainQueueManager.getChannel()
+
+        const allUserOffer = await this.ridesOfferRepository.getAllUserFlares(userId)
+
+        const mappedOffer :any = allUserOffer.filter((data:any) => data._id == offerId).pop()
+
+        const extractedRidesId = mappedOffer._doc['ridesId']
+        const extractedRiderId = mappedOffer._doc['riderId']
+ 
+        const allDocFetch = await Promise.allSettled([
+            this.userRepository.findUserById(userId),
+            this.ridesRepository.getRidesById(extractedRidesId),
+            this.ridesOfferRepository.getRiderOfferById(offerId),
+            this.riderRepository.getRiderName(extractedRiderId)
+        ])
+
+        const filteredRejection = Array.isArray(allDocFetch) && allDocFetch.length > 0  ? allDocFetch.filter((data:any) => data.status !== 'fulfilled') : null
+
+        if(filteredRejection && filteredRejection.length > 0){
+            throw new DatabaseExceptions(`There are some error while retriving the documents from the system, Internal Server Error`)
+        }
+
+        const userDoc = allDocFetch[0]['value']
+        const ridesDoc = allDocFetch[1]['value']
+        const ridesOfferDoc = allDocFetch[2]['value']
+        const riderNameDoc = allDocFetch[3]['value']
+
+        const isOfferAlreadyCompleted =  !ridesOfferDoc.riderOffer.startsWith('NOT') && ridesOfferDoc.riderOffer.endsWith('COMPLETED') 
+
+        if(isOfferAlreadyCompleted){
+            throw new DatabaseExceptions(`The Rides has been already Completed`)
+        }
 
 
+        const deletedPromise = await Promise.allSettled([
+            this.ridesOfferRepository.deleteOffer(offerId),
+            this.ridesRepository.deleteRidesById(extractedRidesId)
+        ])
 
+        const validDeletd = deletedPromise.filter((data:any) => data.status !== 'fulfilled')
+        if(validDeletd.length.toString().startsWith('0')){
+            const isOfferExists = ridesDoc.offers.filter((data:any) => data == offerId)
+
+        if(Array.isArray(isOfferExists) && isOfferExists){
+          
+            const clearOffers = await this.ridesRepository.clearOffer(extractedRidesId)
+            const currentDate = new Date()
+            const payloadUpdate = {
+                ride_started_at : currentDate,
+                ride_completed_at : 'Completed',
+                ride_estimation_time : 'Ride Completed At 30min', //static value for now will use map later 
+                ride_rider : riderNameDoc
+            }
+            const updatedResult = await this.ridesRepository.updateResult(extractedRidesId,payloadUpdate)
+            const ackUpdated = clearOffers.acknowledged && updatedResult.acknowledged
+            const payloadStatus = {
+                offerId,
+                body : {
+                    riderOffer : 'COMPLETED',
+                    rideStart : false
+                }
+            }
+            
+            const updatedRiderHistory = await this.riderRepository.appendUserToHistory(userId,extractedRiderId)
+
+            try{
+                await publishMessageToRiderStatus(payloadStatus,riderStatusChannel,ridesStatusConfig as IQueueConfig)
+            }catch(err){
+                uberLogger.error(`Error while publishing to the $`)
+            }
+            uberLogger.info(`${userDoc['username']} has completed the ride with ${ridesDoc['riderName']}`)
+            return updatedRiderHistory.acknowledged && updatedRiderHistory.matchedCount > 0 ? ackUpdated  : null
+        }
+        } 
+    }
 }
 
 export default new RidesServices()

@@ -18,9 +18,9 @@ const handleRidesStatusConsumer = async (msg: ConsumeMessage | null) => {
         const content = msg.content.toString();
         console.log('Received message:', content);
         const parseContent = JSON.parse(content)
-        const {offerId} = parseContent
+        const {offerId , body } = parseContent
         
-        const updatedResult = await riderOfferRepo.acceptOffer(offerId)
+        const updatedResult = await riderOfferRepo.acceptOffer(offerId,body)
         
         const validUpdated = updatedResult.acknowledged && updatedResult.matchedCount > 0
 

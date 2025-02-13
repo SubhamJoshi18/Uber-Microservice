@@ -15,13 +15,13 @@ class RiderOfferRepository {
         return savedResult
     }
 
-    public async acceptOffer(offerId:any){
+    public async acceptOffer(offerId:any,data:any){
         const updatedReuslt = await RiderOffer.updateOne({
             _id : offerId
         }, 
     {
         $set : {
-            riderOffer : 'ACCEPTED'
+            ...data
         }
     })
     return updatedReuslt

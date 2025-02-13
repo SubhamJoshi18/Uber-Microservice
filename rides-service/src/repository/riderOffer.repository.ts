@@ -28,6 +28,13 @@ class RidesOfferRepository{
         })
         return allFlaresForUser
     }
+
+    public async deleteOffer(offerId:any){
+        const deletedResult = await RiderOffer.deleteOne({
+            _id : offerId
+        })
+        return deletedResult
+    }
 }
 
 
