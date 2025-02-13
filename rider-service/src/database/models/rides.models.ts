@@ -3,9 +3,6 @@ import { formattedMongooseMessage } from '../../utils/transformData'
 
 
 const ridesSchema = new mongoose.Schema({
-
-
-
     ride_current_location : {
         type : String,
         required:[true,formattedMongooseMessage('Ride Current Location')]
@@ -55,8 +52,7 @@ const ridesSchema = new mongoose.Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : 'User',
         required : [true,formattedMongooseMessage('Ride User')]
-    }
-    ,
+    },
     offers : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'RiderOffer'

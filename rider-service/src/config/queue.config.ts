@@ -23,11 +23,12 @@ const userConfig = createConfig('user-queue','user-exchange','user-rk')
 const riderConfig = createConfig('rider-queue','rider-exchange','rider-rk')
 const riderFlareConfig = createConfig('rider-flare-queue','rider-flare-exchange','rider-flare-rk')
 const offerFlareConfig = createConfig('offer-flare-queue','offer-flare-exchange','offer-flare-rk')
-
+const ridesStatusConfig = createConfig('ride-status-queue','ride-status-exchange','ride-status-rk')
 
 export {
     userConfig,
     riderConfig,
     riderFlareConfig,
-    offerFlareConfig
+    offerFlareConfig,
+    ridesStatusConfig
 }

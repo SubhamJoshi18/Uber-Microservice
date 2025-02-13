@@ -8,17 +8,23 @@ import { publishMessageToRider } from '../queues/producer/riderPublisher'
 import { riderConfig } from '../config/queue.config'
 import { IQueueConfig } from '../queues/types'
 import MainQueueManager from '../queues/mainQueueManager'
+import RidesOfferRepository from '../repository/riderOffer.repository'
+import { uberLogger } from '../libs/common.logger'
+import { publishMessageToRiderStatus } from  '../queues/producer/riderStatusPublisher'
+import { ridesStatusConfig } from '../config/queue.config'
 
 
 class RidesServices {
 
     private userRepository : UserRepository
     private ridesRepository : RidesRepository
+    private ridesOfferRepository : RidesOfferRepository
 
     constructor(){
   
         this.userRepository = new UserRepository()
         this.ridesRepository = new RidesRepository()
+        this.ridesOfferRepository = new RidesOfferRepository()
     }
 
     public async createRideServices(userId : userMongoId, parseBody : ICreateRider) : Promise<any|void> {
@@ -98,6 +104,82 @@ class RidesServices {
             return savedResult
         }
     }   
+
+    public async getAllRidesOffer(ridesId : any) {
+        const allRides = await this.ridesRepository.getAllRidesOffer(ridesId)
+
+
+        if(!allRides || (allRides && allRides.length === 0)){
+            throw new DatabaseExceptions(`The Rides Does not Have any offer or it is already Accepted by someone`)
+        }
+        const filteredAccepted = allRides.filter((data:any) => data.riderOffer === 'ACCEPTED')
+        if(Array.isArray(filteredAccepted) && filteredAccepted.length > 0){
+            throw new DatabaseExceptions(`The Rides has been already Accepted by someone`)
+        }
+        return allRides
+    }
+
+    public async acceptOffer(idsObject : {userId : any, offerId : any, ridesId : any}) {
+        const {userId, offerId, ridesId} = idsObject
+        const riderStatusChannel = await MainQueueManager.getChannel()
+        
+        const allDocFetch = await Promise.allSettled([
+            this.userRepository.findUserById(userId),
+            this.ridesRepository.getRidesById(ridesId),
+            this.ridesOfferRepository.getRiderOfferById(offerId)
+        ])
+
+        const filteredRejection = Array.isArray(allDocFetch) && allDocFetch.length > 0  ? allDocFetch.filter((data:any) => data.status !== 'fulfilled') : null
+
+        if(filteredRejection && filteredRejection.length === 0){
+            throw new DatabaseExceptions(`There are some error while retriving the documents from the system, Internal Server Error`)
+        }
+
+        const userDoc = allDocFetch[0]['value']
+        const ridesDoc = allDocFetch[1]['value']
+        const ridesOfferDoc = allDocFetch[2]['value']
+
+        const isAlreadyAccepted = typeof ridesOfferDoc.riderOffer === 'string' && ridesOfferDoc.riderOffer.includes('ACCEPTED')
+        if(isAlreadyAccepted){
+            throw new DatabaseExceptions(`The Offer has been already Accepted`)
+        }
+        uberLogger.info(`The ${userDoc.username} is accepting the offer`)
+
+       
+        const isOfferExists = ridesDoc.offers.filter((data:any) => data === offerId)
+
+        if(Array.isArray(isOfferExists) && isOfferExists){
+          
+            const clearOffers = await this.ridesRepository.clearOffer(ridesId)
+            const currentDate = new Date()
+            const payloadUpdate = {
+                ride_started_at : currentDate
+            }
+            const updatedResult = await this.ridesRepository.updateResult(ridesId,payloadUpdate)
+            const ackUpdated = clearOffers.acknowledged && updatedResult.acknowledged
+            const payloadStatus = {
+                offerId
+            }
+            
+            try{
+                await publishMessageToRiderStatus(payloadStatus,riderStatusChannel,ridesStatusConfig as IQueueConfig)
+            }catch(err){
+                uberLogger.error(`Error while publishing to the $`)
+            }
+            return ackUpdated
+        }
+        
+
+        
+
+
+    
+    }   
+   
+    
+
+
+
 }
 
 export default new RidesServices()

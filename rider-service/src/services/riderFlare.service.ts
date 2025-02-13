@@ -10,6 +10,8 @@ import { uberLogger } from '../libs/common.logger'
 import { publishOfferToUser } from '../queues/producer/offerPublisher'
 import { IQueueConfig } from '../queues/types'
 import RiderOfferRepository from '../repository/riderOffer.repository'
+import RidesRepository from '../repository/rides.Repository'
+
 
 
 class RiderFlareService {
@@ -18,12 +20,14 @@ class RiderFlareService {
     private userRepository : UserRepository
     private riderRepository : RiderRepository
     private offerRiderRepository : RiderOfferRepository
+    private ridesRepository : RidesRepository
 
     constructor(){
         this.userFlareRepository = new UserFlareRepository()
         this.userRepository = new UserRepository()
         this.riderRepository = new RiderRepository()
         this.offerRiderRepository = new RiderOfferRepository()
+        this.ridesRepository = new RidesRepository()
     }
 
     public async getAllFlares(){
@@ -34,7 +38,7 @@ class RiderFlareService {
         return responses
     }
 
-    public async offerRidesToUser(userIdObj : {userId : any, mainUserId : any},parseContent : {offerPrice:number},coOrdinatiesContent){
+    public async offerRidesToUser(userIdObj : {userId : any, mainUserId : any,ridesId : any},parseContent : {offerPrice:number},coOrdinatiesContent){
         const { offerPrice } = parseContent
 
         const offerFlareChannel = await MainQueueManager.createGenericChannel(offerFlareConfig)
@@ -99,10 +103,15 @@ class RiderFlareService {
 
         const preparedData  = Object.assign(prepareDataForDb(mappedPayload,extendedPayload),{userId : userIdObj.userId})
 
-        const savedResult = await this.offerRiderRepository.publishRiderOfferToDb(preparedData,offerPrice)
-        return savedResult
-    }
+        const associatedRides = await this.ridesRepository.getRidesById(userIdObj.ridesId)
 
+        if(!associatedRides){
+            throw new DatabaseExceptions(`The Rides Does not Exists or It is already Completed, Please Check it`)
+        } 
+        const savedResult = await this.offerRiderRepository.publishRiderOfferToDb(preparedData,offerPrice)
+        const updatedResult = await this.ridesRepository.updateRidesById(userIdObj.ridesId,savedResult._id)
+        return updatedResult.acknowledged && updatedResult.matchedCount > 0 ? savedResult : null
+    }
 }   
 
 

@@ -21,12 +21,14 @@ class RiderFlareController {
         try{
             const mainUserid = req.user._id
             const userId = req.params.userId
+            const ridesId = req.params.ridesId
             const content = req.body
             const coOrdinatiesContent = req.query
             const parseContent = validateBody(content,riderOfferFlareSchema)
             const apiResponse = await RiderFlareService.offerRidesToUser({
                 userId :userId as unknown as mongoose.Schema.Types.ObjectId,
-                mainUserId : mainUserid as unknown as mongoose.Schema.Types.ObjectId
+                mainUserId : mainUserid as unknown as mongoose.Schema.Types.ObjectId,
+                ridesId : ridesId as unknown as mongoose.Schema.Types.ObjectId,
             },parseContent as {offerPrice:number},coOrdinatiesContent as {lat : any,lng:any})
             sendApiResposne(res,apiResponse,`The Offer has been Sended to the User`)
         }catch(err){

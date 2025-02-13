@@ -13,6 +13,18 @@ class RiderOfferRepository {
         })
         return savedResult
     }
+
+    public async acceptOffer(offerId:any){
+        const updatedReuslt = await RiderOffer.updateOne({
+            _id : offerId
+        }, 
+    {
+        $set : {
+            riderOffer : 'ACCEPTED'
+        }
+    })
+    return updatedReuslt
+    }
 }
 
 

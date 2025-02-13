@@ -9,8 +9,6 @@ import { sendApiResposne } from '../utils/genericResponse'
 class RidesController {
 
 
-
-
     public async createRides(req:Request,res:Response,next:NextFunction) : Promise<any> {
         try{
             const userId = req.user._id
@@ -22,39 +20,34 @@ class RidesController {
             next(err)
         } 
     }
-
-    public async acceptOffer(req:Request,res:Response,next:NextFunction){
-        try{
-           
+    public async getAllRidesOffer(req:Request,res:Response,next:NextFunction){
+        try{    
+            const ridesId = req.params.ridesId
+            const apiResponse = await RidesServices.getAllRidesOffer(ridesId)
+            sendApiResposne(res,apiResponse,`The Rides has been Started`)
         }catch(err){
            next(err)
         }
    }
 
-    public async cancelOffer(req:Request,res:Response,next:NextFunction){
+   public async acceptOffer(req:Request,res:Response,next:NextFunction){
         try{
-        
-        }catch(err){
-        next(err)
-        }
-    }
+            const userId = req.user._id
+            const offerId = req.params.offerId
+            const ridesId = req.params.ridesId
+            const idsobj = {
+                userId,
+                offerId,
+                ridesId
+            }
+            const apiResponse = await RidesServices.acceptOffer(idsobj)
+            sendApiResposne(res,apiResponse,`The Ride has begin`)
+            
 
-    public async startRide(req:Request,res:Response,next:NextFunction){
-        try{
-        
         }catch(err){
-        next(err)
+            next(err)
         }
-    }
-
-    public async completeRide(req:Request,res:Response,next:NextFunction){
-        try{
-        
-        }catch(err){
-        next(err)
-        }
-    }
-
+   }
 }
 
 
