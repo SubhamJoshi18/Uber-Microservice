@@ -23,6 +23,38 @@ class RidesController {
         } 
     }
 
+    public async acceptOffer(req:Request,res:Response,next:NextFunction){
+        try{
+           
+        }catch(err){
+           next(err)
+        }
+   }
+
+    public async cancelOffer(req:Request,res:Response,next:NextFunction){
+        try{
+        
+        }catch(err){
+        next(err)
+        }
+    }
+
+    public async startRide(req:Request,res:Response,next:NextFunction){
+        try{
+        
+        }catch(err){
+        next(err)
+        }
+    }
+
+    public async completeRide(req:Request,res:Response,next:NextFunction){
+        try{
+        
+        }catch(err){
+        next(err)
+        }
+    }
+
 }
 
 
