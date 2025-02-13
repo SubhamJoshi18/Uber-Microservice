@@ -4,6 +4,7 @@ import amqplib from 'amqplib'
 import { getEnvValue } from '../utils/getEnv'
 import { userQueueEnabled } from '../constants/queues'
 import { userQueueConsumer } from './consumer/user.consumer'
+import { offerFlareConsumer } from './consumer/offer.consumer'
 
 
 export const initQueueConsumer =  async() => {
@@ -27,5 +28,6 @@ const manageQueueServices = async (channel : Channel) => {
     const isEnabled = typeof userQueueEnabled === 'boolean' && userQueueEnabled
     if(isEnabled){
         await userQueueConsumer(channel as Channel)
+        await offerFlareConsumer(channel as Channel)
     }
 }

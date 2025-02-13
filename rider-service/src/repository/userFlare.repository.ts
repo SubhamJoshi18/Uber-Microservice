@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import UserFlare from '../database/models/userFlare.models'
 
 
@@ -18,6 +19,14 @@ class UserFlareRepository {
     async getAll(){
         const response = await UserFlare.find({})
         return response
+    }
+
+
+    async getFlareByUser(userId : string | mongoose.Schema.Types.ObjectId){
+        const searchResult = await UserFlare.findOne({
+            userId : userId
+        })
+        return searchResult
     }
 }
 

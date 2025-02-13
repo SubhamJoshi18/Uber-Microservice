@@ -42,6 +42,10 @@ const riderReportSchema = Joi.object({
     }),
 })
 
+const riderOfferFlareSchema = Joi.object({
+  offerPrice : Joi.number()
+})
+
 // const createFlareSchema = Joi.object({
 //   flareMoney : Joi.number(),
 //   flareComment : Joi.string().optional()
@@ -50,5 +54,6 @@ const riderReportSchema = Joi.object({
 export {
     createRiderSchema,
     riderReportSchema,
-    updatedRiderSchema
+    updatedRiderSchema,
+    riderOfferFlareSchema
 }

@@ -36,3 +36,29 @@ export const extractRiderData = (riderPayload : object | any) => {
     }
     return extractPayload
 }
+
+export const extractAndMapOffer = (flarePayload : object | any,newFlare:number) => {
+    const extractedPayload = {
+        newFlare : newFlare,
+        riderStatus : flarePayload.isActiveRide,
+        rideCurrentLocation : {
+             lat : flarePayload.lat,
+             lng : flarePayload.lng
+        },
+        message : `The ${flarePayload.riderName} has offer the Flare ${newFlare}`
+    }
+    return extractedPayload
+}
+
+
+export const prepareDataForDb = (mappedRecord : any, extractedPayload : any) => {
+    const extractedMapped = {
+        newFlare  : mappedRecord.newFlare,
+        riderCurrentLocation : mappedRecord.rideCurrentLocation,
+        message : mappedRecord.message,
+        riderName:extractedPayload.riderName,
+        riderId : extractedPayload.riderId
+    }
+    return extractedMapped
+    
+}
