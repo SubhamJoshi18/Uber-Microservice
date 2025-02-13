@@ -12,19 +12,21 @@ import RidesOfferRepository from '../repository/riderOffer.repository'
 import { uberLogger } from '../libs/common.logger'
 import { publishMessageToRiderStatus } from  '../queues/producer/riderStatusPublisher'
 import { ridesStatusConfig } from '../config/queue.config'
-
+import RiderRepository from '../repository/rider.repository'
 
 class RidesServices {
 
     private userRepository : UserRepository
     private ridesRepository : RidesRepository
     private ridesOfferRepository : RidesOfferRepository
+    private riderRepository : RiderRepository
 
     constructor(){
   
         this.userRepository = new UserRepository()
         this.ridesRepository = new RidesRepository()
         this.ridesOfferRepository = new RidesOfferRepository()
+        this.riderRepository = new RiderRepository()
     }
 
     public async createRideServices(userId : userMongoId, parseBody : ICreateRider) : Promise<any|void> {
@@ -129,11 +131,13 @@ class RidesServices {
 
 
         const extractedRidesId = mappedOffer._doc['ridesId']
+        const extractedRiderId = mappedOffer._doc['riderId']
  
         const allDocFetch = await Promise.allSettled([
             this.userRepository.findUserById(userId),
             this.ridesRepository.getRidesById(extractedRidesId),
-            this.ridesOfferRepository.getRiderOfferById(offerId)
+            this.ridesOfferRepository.getRiderOfferById(offerId),
+            this.riderRepository.getRiderName(extractedRiderId)
         ])
 
         const filteredRejection = Array.isArray(allDocFetch) && allDocFetch.length > 0  ? allDocFetch.filter((data:any) => data.status !== 'fulfilled') : null
@@ -145,6 +149,7 @@ class RidesServices {
         const userDoc = allDocFetch[0]['value']
         const ridesDoc = allDocFetch[1]['value']
         const ridesOfferDoc = allDocFetch[2]['value']
+        const riderNameDoc = allDocFetch[3]['value']
   
         const isAlreadyAccepted = typeof ridesOfferDoc.riderOffer === 'string' && !ridesOfferDoc.riderOffer.startsWith('NOT')
         if(isAlreadyAccepted){
@@ -160,7 +165,10 @@ class RidesServices {
             const clearOffers = await this.ridesRepository.clearOffer(extractedRidesId)
             const currentDate = new Date()
             const payloadUpdate = {
-                ride_started_at : currentDate
+                ride_started_at : currentDate,
+                ride_completed_at : 'On Going Ride',
+                ride_estimation_time : '15km',
+                ride_rider : riderNameDoc
             }
             const updatedResult = await this.ridesRepository.updateResult(extractedRidesId,payloadUpdate)
             const ackUpdated = clearOffers.acknowledged && updatedResult.acknowledged

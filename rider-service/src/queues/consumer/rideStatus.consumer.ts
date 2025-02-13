@@ -7,6 +7,7 @@ import RiderOfferRepository from '../../repository/riderOffer.repository'
 const riderOfferRepo = new RiderOfferRepository()
 
 
+
 const handleRidesStatusConsumer = async (msg: ConsumeMessage | null) => {
     if (!msg) {
         console.warn('Received null message');
