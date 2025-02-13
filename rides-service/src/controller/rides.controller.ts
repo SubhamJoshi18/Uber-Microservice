@@ -34,11 +34,9 @@ class RidesController {
         try{
             const userId = req.user._id
             const offerId = req.params.offerId
-            const ridesId = req.params.ridesId
             const idsobj = {
                 userId,
                 offerId,
-                ridesId
             }
             const apiResponse = await RidesServices.acceptOffer(idsobj)
             sendApiResposne(res,apiResponse,`The Ride has begin`)

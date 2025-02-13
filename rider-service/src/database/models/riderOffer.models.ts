@@ -35,6 +35,10 @@ const offerRiderSchema = new mongoose.Schema({
     userId : {
         type : mongoose.Schema.Types.ObjectId,
         ref:'User'
+    },
+    ridesId : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref: 'RiderOffer'
     }
 },
 {

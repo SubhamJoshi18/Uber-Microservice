@@ -94,13 +94,7 @@ class RiderFlareService {
 
         const mappedPayload = extractAndMapOffer(Object.assign(extractedPayload,extendedPayload),offerPrice)
 
-        try{
-            await publishOfferToUser(offerFlareChannel,offerFlareConfig as IQueueConfig,mappedPayload)
-        }catch(err){
-            uberLogger.error(`Error publishing the message : ${JSON.stringify(mappedPayload)} to the ${offerFlareConfig['queueName']}`)
-            return
-        }
-
+      
         const preparedData  = Object.assign(prepareDataForDb(mappedPayload,extendedPayload),{userId : userIdObj.userId})
 
         const associatedRides = await this.ridesRepository.getRidesById(userIdObj.ridesId)
@@ -108,8 +102,16 @@ class RiderFlareService {
         if(!associatedRides){
             throw new DatabaseExceptions(`The Rides Does not Exists or It is already Completed, Please Check it`)
         } 
-        const savedResult = await this.offerRiderRepository.publishRiderOfferToDb(preparedData,offerPrice)
+        const savedResult = await this.offerRiderRepository.publishRiderOfferToDb(preparedData,offerPrice,userIdObj.ridesId)
         const updatedResult = await this.ridesRepository.updateRidesById(userIdObj.ridesId,savedResult._id)
+
+        try{
+            await publishOfferToUser(offerFlareChannel,offerFlareConfig as IQueueConfig,mappedPayload)
+        }catch(err){
+            uberLogger.error(`Error publishing the message : ${JSON.stringify(mappedPayload)} to the ${offerFlareConfig['queueName']}`)
+            return
+        }
+
         return updatedResult.acknowledged && updatedResult.matchedCount > 0 ? savedResult : null
     }
 }   

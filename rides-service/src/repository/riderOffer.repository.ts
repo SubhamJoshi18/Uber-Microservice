@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import RiderOffer from '../database/models/riderOffer.models'
 
 class RidesOfferRepository{
@@ -21,8 +22,12 @@ class RidesOfferRepository{
     return updatedReuslt
     }
 
-
-    
+    public async getAllUserFlares(userId : mongoose.Schema.Types.ObjectId | string){
+        const allFlaresForUser = await RiderOffer.find({
+            userId : userId
+        })
+        return allFlaresForUser
+    }
 }
 
 

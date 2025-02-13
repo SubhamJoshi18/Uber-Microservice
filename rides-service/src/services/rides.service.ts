@@ -119,43 +119,50 @@ class RidesServices {
         return allRides
     }
 
-    public async acceptOffer(idsObject : {userId : any, offerId : any, ridesId : any}) {
-        const {userId, offerId, ridesId} = idsObject
+    public async acceptOffer(idsObject : {userId : any, offerId : any}) : Promise<any> { 
+        const {userId, offerId} = idsObject
         const riderStatusChannel = await MainQueueManager.getChannel()
-        
+
+        const allUserOffer = await this.ridesOfferRepository.getAllUserFlares(userId)
+
+        const mappedOffer :any = allUserOffer.filter((data:any) => data.userId == userId && data._id == offerId).pop()
+
+
+        const extractedRidesId = mappedOffer._doc['ridesId']
+ 
         const allDocFetch = await Promise.allSettled([
             this.userRepository.findUserById(userId),
-            this.ridesRepository.getRidesById(ridesId),
+            this.ridesRepository.getRidesById(extractedRidesId),
             this.ridesOfferRepository.getRiderOfferById(offerId)
         ])
 
         const filteredRejection = Array.isArray(allDocFetch) && allDocFetch.length > 0  ? allDocFetch.filter((data:any) => data.status !== 'fulfilled') : null
 
-        if(filteredRejection && filteredRejection.length === 0){
+        if(filteredRejection && filteredRejection.length > 0){
             throw new DatabaseExceptions(`There are some error while retriving the documents from the system, Internal Server Error`)
         }
 
         const userDoc = allDocFetch[0]['value']
         const ridesDoc = allDocFetch[1]['value']
         const ridesOfferDoc = allDocFetch[2]['value']
-
-        const isAlreadyAccepted = typeof ridesOfferDoc.riderOffer === 'string' && ridesOfferDoc.riderOffer.includes('ACCEPTED')
+  
+        const isAlreadyAccepted = typeof ridesOfferDoc.riderOffer === 'string' && !ridesOfferDoc.riderOffer.startsWith('NOT')
         if(isAlreadyAccepted){
             throw new DatabaseExceptions(`The Offer has been already Accepted`)
         }
         uberLogger.info(`The ${userDoc.username} is accepting the offer`)
 
        
-        const isOfferExists = ridesDoc.offers.filter((data:any) => data === offerId)
+        const isOfferExists = ridesDoc.offers.filter((data:any) => data == offerId)
 
         if(Array.isArray(isOfferExists) && isOfferExists){
           
-            const clearOffers = await this.ridesRepository.clearOffer(ridesId)
+            const clearOffers = await this.ridesRepository.clearOffer(extractedRidesId)
             const currentDate = new Date()
             const payloadUpdate = {
                 ride_started_at : currentDate
             }
-            const updatedResult = await this.ridesRepository.updateResult(ridesId,payloadUpdate)
+            const updatedResult = await this.ridesRepository.updateResult(extractedRidesId,payloadUpdate)
             const ackUpdated = clearOffers.acknowledged && updatedResult.acknowledged
             const payloadStatus = {
                 offerId
@@ -168,12 +175,7 @@ class RidesServices {
             }
             return ackUpdated
         }
-        
 
-        
-
-
-    
     }   
    
     
