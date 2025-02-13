@@ -1,4 +1,4 @@
-## 🚗 Uber-like Microservice with Node.js, Express.js, TypeScript, RabbitMQ, and MongoDB
+## 🚗 Uber-like Microservice or Pathao-like Microservice with Node.js, Express.js, TypeScript, RabbitMQ, and MongoDB
 
 This project is a scalable, event-driven Uber-like ride-hailing microservice built with Node.js, Express.js, TypeScript, RabbitMQ, and MongoDB. Designed for real-time ride requests, driver allocation, payment processing, and user management, this system leverages a microservices architecture to ensure efficiency, reliability, and scalability.
 
